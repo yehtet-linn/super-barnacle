@@ -1,89 +1,36 @@
-// type aliaes
-type stringOrNum = string | number;
-type stringOrNumArr = (string | number)[];
+type One = string;
+type Two = string | number;
+type Three = "welcome";
 
-type GuitarList = {
-  name?: string;
-  isActive?: boolean;
-  album: stringOrNumArr;
+// convert it into more specific to less specific
+let a: One = "welcome";
+let b = a as Two; // less specific
+let c = a as Three; //more specific
+
+let d = <One>"guy";
+let e = <string | number>"guy";
+
+const addOrConcat = (
+  a: number,
+  b: number,
+  c: "add" | "concat"
+): number | string => {
+  if (c === "add") return a + b;
+  return "" + a + b;
 };
 
-type userId = stringOrNum;
+let myVal: string = addOrConcat(6, 1, "concat") as string;
+// return as string
+let newVal: number = addOrConcat(9, 2, "add") as number;
 
-// literal types
-let myName: "Chains";
+// 60 as string
+60 as unknown as string;
 
-let userName: "Chase" | "David" | "Kate";
-userName = "Kate";
+// dom
+const img = document.querySelector("img")!; // express non null dom
+const myImg = document.querySelector("#img") as HTMLImageElement;
+const nextImg = <HTMLImageElement>document.querySelector("#img");
 
-// function
-const addNum = (a: number, b: number): number => {
-  return a + b;
-};
-
-let subNum = function (c: number, d: number): number {
-  return c - d;
-};
-
-// type mathFunc = (a: number, b: number) => number;
-interface mathFunc {
-  (a: number, b: number): number;
-}
-
-let multiNum: mathFunc = function (a, b): number {
-  return a * b;
-};
-
-const logMsg = (msg: any): void => {
-  console.log(msg);
-};
-
-logMsg("Welcome");
-logMsg(addNum(4, 6));
-logMsg(subNum(4, 1));
-logMsg(multiNum(4, 7));
-
-// optional parameters
-const addAll = (a: number, b: number, c?: number): number => {
-  if (typeof c !== "undefined") return a + b + c;
-  return a + b;
-};
-
-const sumAll = (a: number, b: number, c: number = 3): number => {
-  return a + b + c;
-};
-
-logMsg(addAll(1, 9, undefined));
-logMsg(sumAll(1, 3, undefined));
-
-// Rest parameters
-const totalNum = (a: number, ...nums: number[]): number => {
-  return a + nums.reduce((prev, curr) => prev + curr);
-};
-
-logMsg(totalNum(1, 2, 3));
-
-const createErr = (msg: string): never => {
-  throw new Error(msg);
-};
-
-const infinite = () => {
-  let i: number = 1;
-  while (true) {
-    i++;
-    if (i < 100) break;
-  }
-};
-
-// create type guards
-const isNumber = (num: any): boolean => {
-  return typeof num === "number" ? true : false;
-};
-
-// use never type
-const numberOrString = (a: string | number): string => {
-  if (typeof a === "string") return "string type";
-  if (isNumber(a)) return "number type";
-
-  return createErr("This should not have done.");
-};
+img.src;
+myImg.src;
+nextImg.src;
