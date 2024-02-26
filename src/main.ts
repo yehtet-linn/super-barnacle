@@ -1,89 +1,95 @@
-// type aliaes
-type stringOrNum = string | number;
-type stringOrNumArr = (string | number)[];
+// using index signature
 
-type GuitarList = {
-  name?: string;
-  isActive?: boolean;
-  album: stringOrNumArr;
-};
-
-type userId = stringOrNum;
-
-// literal types
-let myName: "Chains";
-
-let userName: "Chase" | "David" | "Kate";
-userName = "Kate";
-
-// function
-const addNum = (a: number, b: number): number => {
-  return a + b;
-};
-
-let subNum = function (c: number, d: number): number {
-  return c - d;
-};
-
-// type mathFunc = (a: number, b: number) => number;
-interface mathFunc {
-  (a: number, b: number): number;
+// Phase 1
+// interface TransactionObj {
+//   readonly [index: string]: number;
+// }
+interface TransactionObj {
+  readonly [index: string]: number;
+  Food: number;
+  Books: number;
+  Hobbies: number;
 }
 
-let multiNum: mathFunc = function (a, b): number {
-  return a * b;
+// interface TransactionObj {
+//   Food: string;
+//   Books: string;
+//   Hobbies: string;
+// }
+
+const transactionObj: TransactionObj = {
+  Food: 20,
+  Books: 10,
+  Hobbies: 30,
+  Job: 33,
 };
 
-const logMsg = (msg: any): void => {
-  console.log(msg);
-};
+console.log(transactionObj.Books);
+console.log("Books (pointer)" + transactionObj["Books"]);
 
-logMsg("Welcome");
-logMsg(addNum(4, 6));
-logMsg(subNum(4, 1));
-logMsg(multiNum(4, 7));
+const prop: string = "Books";
+console.log("Books (index signature)" + transactionObj[prop]);
 
-// optional parameters
-const addAll = (a: number, b: number, c?: number): number => {
-  if (typeof c !== "undefined") return a + b + c;
-  return a + b;
-};
-
-const sumAll = (a: number, b: number, c: number = 3): number => {
-  return a + b + c;
-};
-
-logMsg(addAll(1, 9, undefined));
-logMsg(sumAll(1, 3, undefined));
-
-// Rest parameters
-const totalNum = (a: number, ...nums: number[]): number => {
-  return a + nums.reduce((prev, curr) => prev + curr);
-};
-
-logMsg(totalNum(1, 2, 3));
-
-const createErr = (msg: string): never => {
-  throw new Error(msg);
-};
-
-const infinite = () => {
-  let i: number = 1;
-  while (true) {
-    i++;
-    if (i < 100) break;
+const todayTrans = (transactions: TransactionObj): number => {
+  let total = 0;
+  for (const transaction in transactions) {
+    total += transactions[transaction];
   }
+  return total;
 };
 
-// create type guards
-const isNumber = (num: any): boolean => {
-  return typeof num === "number" ? true : false;
+console.log(todayTrans(transactionObj));
+console.log(transactionObj["Job"]);
+
+// Phase 2
+interface Student {
+  // [key: string]: string | number | number[] | undefined;
+  name: string;
+  gpa: number;
+  classes?: number[];
+}
+
+const student: Student = {
+  name: "John",
+  gpa: 3.5,
+  classes: [100, 300],
 };
 
-// use never type
-const numberOrString = (a: string | number): string => {
-  if (typeof a === "string") return "string type";
-  if (isNumber(a)) return "number type";
+// console.log(student.test);
 
-  return createErr("This should not have done.");
+for (const key in student) {
+  console.log(`${key} ${student[key as keyof Student]}`);
+}
+
+Object.keys(student).map((key) => {
+  console.log(`${key} ${student[key as keyof typeof student]}`);
+});
+
+const logStudentKey = (student: Student, key: keyof Student): void => {
+  console.log(`Student ${key} is ${student[key]}`);
 };
+
+logStudentKey(student, "gpa");
+logStudentKey(student, "name");
+
+// Phase 3
+// using Record utilities
+
+// interface Streams {
+//   salary: string;
+//   bonus: string;
+//   fees: string;
+// }
+type Streams = "salary" | "bonus" | "fees";
+
+type Incomes = Record<Streams, string | number>;
+
+const incomes: Incomes = {
+  salary: 100,
+  bonus: 400,
+  fees: "600",
+};
+
+for (const revenue in incomes) {
+  console.log(`${revenue} ${incomes[revenue as keyof Incomes]}`);
+}
