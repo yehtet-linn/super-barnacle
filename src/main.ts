@@ -1,95 +1,142 @@
-// using index signature
+// generics
 
 // Phase 1
-// interface TransactionObj {
-//   readonly [index: string]: number;
-// }
-interface TransactionObj {
-  readonly [index: string]: number;
-  Food: number;
-  Books: number;
-  Hobbies: number;
+const echo = <T>(arg: T): T => arg;
+
+// checked the type should be an object
+const isObj = <T>(arg: T): boolean => {
+  return typeof arg === "object" && !Array.isArray(arg) && arg !== null;
+};
+
+console.log(isObj(false));
+console.log(isObj([43, 43, 61]));
+console.log(isObj("Welcome"));
+console.log(isObj(null));
+
+console.log(isObj({ name: "Smith", age: 24 }));
+
+interface BoolCheck<T> {
+  value: T;
+  is: boolean;
 }
 
-// interface TransactionObj {
-//   Food: string;
-//   Books: string;
-//   Hobbies: string;
-// }
+// checked the type should be an array or an object
+const checkBool = <T>(arg: T): BoolCheck<T> => {
+  if (Array.isArray(arg) && !arg.length) return { value: arg, is: false };
 
-const transactionObj: TransactionObj = {
-  Food: 20,
-  Books: 10,
-  Hobbies: 30,
-  Job: 33,
+  if (isObj(arg) && !Object.keys(arg as keyof T))
+    return { value: arg, is: false };
+
+  return { value: arg, is: !!arg };
 };
 
-console.log(transactionObj.Books);
-console.log("Books (pointer)" + transactionObj["Books"]);
-
-const prop: string = "Books";
-console.log("Books (index signature)" + transactionObj[prop]);
-
-const todayTrans = (transactions: TransactionObj): number => {
-  let total = 0;
-  for (const transaction in transactions) {
-    total += transactions[transaction];
-  }
-  return total;
-};
-
-console.log(todayTrans(transactionObj));
-console.log(transactionObj["Job"]);
+console.log(checkBool(false));
+console.log(checkBool(0));
+console.log(checkBool(true));
+console.log(checkBool(1));
+console.log(checkBool("Dave"));
+console.log(checkBool(""));
+console.log(checkBool(null));
+console.log(checkBool(undefined));
+console.log(checkBool({}));
+console.log(checkBool([]));
+console.log(checkBool([1, 2, 3]));
+console.log(checkBool(NaN));
+console.log(checkBool(-1));
 
 // Phase 2
-interface Student {
-  // [key: string]: string | number | number[] | undefined;
-  name: string;
-  gpa: number;
-  classes?: number[];
+interface HasId {
+  id: number;
 }
 
-const student: Student = {
-  name: "John",
-  gpa: 3.5,
-  classes: [100, 300],
+const processUser = <T extends HasId>(user: T): T => {
+  return user;
 };
 
-// console.log(student.test);
+console.log(processUser({ id: 36, name: "Shun" }));
 
-for (const key in student) {
-  console.log(`${key} ${student[key as keyof Student]}`);
+const getUserProperty = <T extends HasId, K extends keyof T>(
+  users: T[],
+  key: K
+): T[K][] => {
+  return users.map((user) => user[key]);
+};
+
+const usersArray = [
+  {
+    id: 1,
+    name: "John Doe",
+    username: "johndoe",
+    email: "john.doe@example.com",
+    address: {
+      street: "123 Main St",
+      suite: "Apt. 101",
+      city: "Anytown",
+      zipcode: "12345",
+      geo: {
+        lat: "40.7128",
+        lng: "-74.0060",
+      },
+    },
+    phone: "555-555-5555",
+    website: "johndoe.com",
+    company: {
+      name: "ABC Inc.",
+      catchPhrase: "Empowering businesses worldwide",
+      bs: "Innovate and grow",
+    },
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    username: "janesmith",
+    email: "jane.smith@example.com",
+    address: {
+      street: "456 Elm St",
+      suite: "Suite 200",
+      city: "Smalltown",
+      zipcode: "54321",
+      geo: {
+        lat: "35.6895",
+        lng: "139.6917",
+      },
+    },
+    phone: "555-123-4567",
+    website: "janesmith.com",
+    company: {
+      name: "XYZ Corp.",
+      catchPhrase: "Driving innovation forward",
+      bs: "Exceeding expectations",
+    },
+  },
+];
+
+console.log(getUserProperty(usersArray, "name"));
+console.log(getUserProperty(usersArray, "email"));
+
+class StateObject<T> {
+  private value: T;
+
+  constructor(item: T) {
+    this.value = item;
+  }
+
+  get data(): T {
+    return this.value;
+  }
+
+  set data(item: T) {
+    this.value = item;
+  }
 }
 
-Object.keys(student).map((key) => {
-  console.log(`${key} ${student[key as keyof typeof student]}`);
-});
+const store = new StateObject("Victoria");
+console.log(store.data);
+store.data = "Smith";
+console.log(store.data);
+// store.data = 12;   // it can't be because of inferring the Victoria Type string
 
-const logStudentKey = (student: Student, key: keyof Student): void => {
-  console.log(`Student ${key} is ${student[key]}`);
-};
-
-logStudentKey(student, "gpa");
-logStudentKey(student, "name");
-
-// Phase 3
-// using Record utilities
-
-// interface Streams {
-//   salary: string;
-//   bonus: string;
-//   fees: string;
-// }
-type Streams = "salary" | "bonus" | "fees";
-
-type Incomes = Record<Streams, string | number>;
-
-const incomes: Incomes = {
-  salary: 100,
-  bonus: 400,
-  fees: "600",
-};
-
-for (const revenue in incomes) {
-  console.log(`${revenue} ${incomes[revenue as keyof Incomes]}`);
-}
+const myStore = new StateObject<(string | number | boolean)[]>([20]);
+myStore.data = ["Smith", 32, false];
+console.log(myStore.data);
+// myStore.data = 'welcome' // it can't be because of inferring the union Array Type
