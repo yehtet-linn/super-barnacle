@@ -1,51 +1,74 @@
 "use strict";
-// using index signature
-// interface TransactionObj {
-//   Food: string;
-//   Books: string;
-//   Hobbies: string;
-// }
-const transactionObj = {
-    Food: 20,
-    Books: 10,
-    Hobbies: 30,
-    Job: 33,
+// Utilities Types
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 };
-console.log(transactionObj.Books);
-console.log("Books (pointer)" + transactionObj["Books"]);
-const prop = "Books";
-console.log("Books (index signature)" + transactionObj[prop]);
-const todayTrans = (transactions) => {
-    let total = 0;
-    for (const transaction in transactions) {
-        total += transactions[transaction];
-    }
-    return total;
+const updateAssignment = (props, propsToUpdate) => {
+    return Object.assign(Object.assign({}, props), propsToUpdate);
 };
-console.log(todayTrans(transactionObj));
-console.log(transactionObj["Job"]);
-const student = {
-    name: "John",
-    gpa: 3.5,
-    classes: [100, 300],
+const assignment = {
+    studentId: "991",
+    title: "Capstone Project",
+    grade: 0,
 };
-// console.log(student.test);
-for (const key in student) {
-    console.log(`${key} ${student[key]}`);
-}
-Object.keys(student).map((key) => {
-    console.log(`${key} ${student[key]}`);
+console.log(updateAssignment(assignment, { grade: 3.7 }));
+const assignA = updateAssignment(assignment, { studentId: "444" });
+console.log(assignA);
+// Required Utilities
+const recordAssignment = (requiredProps) => {
+    return requiredProps;
+};
+console.log(recordAssignment(Object.assign(Object.assign({}, assignment), { verfied: true })));
+// Readonly Utilities
+const assignmentVerfied = Object.assign(Object.assign({}, assignment), { grade: 3.3, verfied: true });
+console.log(assignmentVerfied);
+const finalGrades = {
+    Amara: "A",
+    Chris: "B",
+    Marry: "U",
+};
+const semesterGrades = {
+    Amara: { assignA: 32, assignB: 63 },
+    Chris: { assignA: 54, assignB: 52 },
+    Marry: { assignA: 43, assignB: 56 },
+};
+console.log(semesterGrades);
+const assignResult = {
+    studentId: "132",
+    grade: 3.78,
+};
+const assignPreview = {
+    grade: 3.56,
+    verfied: true,
+};
+// Return Type
+// type NewlyAssign = { title: string; points: number };
+// const createNewlyAssign = (title: string, points: number):NewlyAssign => {
+//   return { title, points };
+// };
+const createNewlyAssign = (title, points) => {
+    return { title, points };
+};
+const newAssign = createNewlyAssign("Utility Assing", 60);
+console.log(newAssign);
+const assignArgsA = ["Assign A", 4];
+const assignArgsB = createNewlyAssign(...assignArgsA);
+console.log(assignArgsB);
+const fetchUsers = () => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield fetch("https://jsonplaceholder.typicode.com/users")
+        .then((res) => {
+        return res.json();
+    })
+        .catch((err) => {
+        if (err instanceof Error)
+            console.log(err.message);
+    });
+    return data;
 });
-const logStudentKey = (student, key) => {
-    console.log(`Student ${key} is ${student[key]}`);
-};
-logStudentKey(student, "gpa");
-logStudentKey(student, "name");
-const incomes = {
-    salary: 100,
-    bonus: 400,
-    fees: "600",
-};
-for (const revenue in incomes) {
-    console.log(`${revenue} ${incomes[revenue]}`);
-}
+fetchUsers().then((users) => console.log(users));

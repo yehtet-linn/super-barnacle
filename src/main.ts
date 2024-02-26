@@ -1,95 +1,137 @@
-// using index signature
+// Utilities Types
 
-// Phase 1
-// interface TransactionObj {
-//   readonly [index: string]: number;
-// }
-interface TransactionObj {
-  readonly [index: string]: number;
-  Food: number;
-  Books: number;
-  Hobbies: number;
+// Partial
+interface Assignment {
+  studentId: string;
+  title: string;
+  grade: number;
+  verfied?: boolean;
 }
 
-// interface TransactionObj {
-//   Food: string;
-//   Books: string;
-//   Hobbies: string;
-// }
-
-const transactionObj: TransactionObj = {
-  Food: 20,
-  Books: 10,
-  Hobbies: 30,
-  Job: 33,
+const updateAssignment = (
+  props: Assignment,
+  propsToUpdate: Partial<Assignment>
+): Assignment => {
+  return { ...props, ...propsToUpdate };
 };
 
-console.log(transactionObj.Books);
-console.log("Books (pointer)" + transactionObj["Books"]);
-
-const prop: string = "Books";
-console.log("Books (index signature)" + transactionObj[prop]);
-
-const todayTrans = (transactions: TransactionObj): number => {
-  let total = 0;
-  for (const transaction in transactions) {
-    total += transactions[transaction];
-  }
-  return total;
+const assignment: Assignment = {
+  studentId: "991",
+  title: "Capstone Project",
+  grade: 0,
 };
 
-console.log(todayTrans(transactionObj));
-console.log(transactionObj["Job"]);
+console.log(updateAssignment(assignment, { grade: 3.7 }));
+const assignA = updateAssignment(assignment, { studentId: "444" });
+console.log(assignA);
 
-// Phase 2
-interface Student {
-  // [key: string]: string | number | number[] | undefined;
+// Required Utilities
+const recordAssignment = (requiredProps: Required<Assignment>): Assignment => {
+  return requiredProps;
+};
+
+console.log(recordAssignment({ ...assignment, verfied: true }));
+
+// Readonly Utilities
+const assignmentVerfied: Readonly<Assignment> = {
+  ...assignment,
+  grade: 3.3,
+  verfied: true,
+};
+
+console.log(assignmentVerfied);
+
+// Record Utilities
+type Student = "Amara" | "Chris" | "Marry";
+type GradePoint = "A" | "B" | "C" | "U";
+
+const finalGrades: Record<Student, GradePoint> = {
+  Amara: "A",
+  Chris: "B",
+  Marry: "U",
+};
+
+interface Grades {
+  assignA: number;
+  assignB: number;
+}
+
+const semesterGrades: Record<Student, Grades> = {
+  Amara: { assignA: 32, assignB: 63 },
+  Chris: { assignA: 54, assignB: 52 },
+  Marry: { assignA: 43, assignB: 56 },
+};
+
+console.log(semesterGrades);
+
+// Pick and Omit Utilities
+type AssignResult = Pick<Assignment, "studentId" | "grade">;
+
+const assignResult: AssignResult = {
+  studentId: "132",
+  grade: 3.78,
+};
+
+type AssignPreview = Omit<Assignment, "studentId" | "title">;
+
+const assignPreview: AssignPreview = {
+  grade: 3.56,
+  verfied: true,
+};
+
+type AdjustGrade = Exclude<GradePoint, "U">;
+
+type HighGrade = Extract<GradePoint, "A" | "B">;
+
+type AllGradePoints = "A" | "B" | "C" | "D" | "E" | "F" | null | undefined;
+
+type NameOnly = NonNullable<AllGradePoints>;
+
+// Return Type
+// type NewlyAssign = { title: string; points: number };
+
+// const createNewlyAssign = (title: string, points: number):NewlyAssign => {
+//   return { title, points };
+// };
+
+const createNewlyAssign = (title: string, points: number) => {
+  return { title, points };
+};
+
+type NewAssign = ReturnType<typeof createNewlyAssign>;
+
+const newAssign: NewAssign = createNewlyAssign("Utility Assing", 60);
+console.log(newAssign);
+
+// Parameters
+type AssignParams = Parameters<typeof createNewlyAssign>;
+
+const assignArgsA: AssignParams = ["Assign A", 4];
+
+const assignArgsB: NewAssign = createNewlyAssign(...assignArgsA);
+console.log(assignArgsB);
+
+// Awaited
+interface User {
+  id: number;
   name: string;
-  gpa: number;
-  classes?: number[];
+  username: string;
+  email: string;
+  address: string;
 }
 
-const student: Student = {
-  name: "John",
-  gpa: 3.5,
-  classes: [100, 300],
+const fetchUsers = async (): Promise<User[]> => {
+  const data = await fetch("https://jsonplaceholder.typicode.com/users")
+    .then((res) => {
+      return res.json();
+    })
+    .catch((err) => {
+      if (err instanceof Error) console.log(err.message);
+    });
+
+  return data;
 };
 
-// console.log(student.test);
+type FetchUserReturn = Awaited<ReturnType<typeof fetchUsers>>;
 
-for (const key in student) {
-  console.log(`${key} ${student[key as keyof Student]}`);
-}
-
-Object.keys(student).map((key) => {
-  console.log(`${key} ${student[key as keyof typeof student]}`);
-});
-
-const logStudentKey = (student: Student, key: keyof Student): void => {
-  console.log(`Student ${key} is ${student[key]}`);
-};
-
-logStudentKey(student, "gpa");
-logStudentKey(student, "name");
-
-// Phase 3
-// using Record utilities
-
-// interface Streams {
-//   salary: string;
-//   bonus: string;
-//   fees: string;
-// }
-type Streams = "salary" | "bonus" | "fees";
-
-type Incomes = Record<Streams, string | number>;
-
-const incomes: Incomes = {
-  salary: 100,
-  bonus: 400,
-  fees: "600",
-};
-
-for (const revenue in incomes) {
-  console.log(`${revenue} ${incomes[revenue as keyof Incomes]}`);
-}
+fetchUsers().then((users) => console.log(users));
