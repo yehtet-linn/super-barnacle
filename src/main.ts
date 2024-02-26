@@ -1,142 +1,137 @@
-// generics
+// Utilities Types
 
-// Phase 1
-const echo = <T>(arg: T): T => arg;
-
-// checked the type should be an object
-const isObj = <T>(arg: T): boolean => {
-  return typeof arg === "object" && !Array.isArray(arg) && arg !== null;
-};
-
-console.log(isObj(false));
-console.log(isObj([43, 43, 61]));
-console.log(isObj("Welcome"));
-console.log(isObj(null));
-
-console.log(isObj({ name: "Smith", age: 24 }));
-
-interface BoolCheck<T> {
-  value: T;
-  is: boolean;
+// Partial
+interface Assignment {
+  studentId: string;
+  title: string;
+  grade: number;
+  verfied?: boolean;
 }
 
-// checked the type should be an array or an object
-const checkBool = <T>(arg: T): BoolCheck<T> => {
-  if (Array.isArray(arg) && !arg.length) return { value: arg, is: false };
-
-  if (isObj(arg) && !Object.keys(arg as keyof T))
-    return { value: arg, is: false };
-
-  return { value: arg, is: !!arg };
+const updateAssignment = (
+  props: Assignment,
+  propsToUpdate: Partial<Assignment>
+): Assignment => {
+  return { ...props, ...propsToUpdate };
 };
 
-console.log(checkBool(false));
-console.log(checkBool(0));
-console.log(checkBool(true));
-console.log(checkBool(1));
-console.log(checkBool("Dave"));
-console.log(checkBool(""));
-console.log(checkBool(null));
-console.log(checkBool(undefined));
-console.log(checkBool({}));
-console.log(checkBool([]));
-console.log(checkBool([1, 2, 3]));
-console.log(checkBool(NaN));
-console.log(checkBool(-1));
+const assignment: Assignment = {
+  studentId: "991",
+  title: "Capstone Project",
+  grade: 0,
+};
 
-// Phase 2
-interface HasId {
+console.log(updateAssignment(assignment, { grade: 3.7 }));
+const assignA = updateAssignment(assignment, { studentId: "444" });
+console.log(assignA);
+
+// Required Utilities
+const recordAssignment = (requiredProps: Required<Assignment>): Assignment => {
+  return requiredProps;
+};
+
+console.log(recordAssignment({ ...assignment, verfied: true }));
+
+// Readonly Utilities
+const assignmentVerfied: Readonly<Assignment> = {
+  ...assignment,
+  grade: 3.3,
+  verfied: true,
+};
+
+console.log(assignmentVerfied);
+
+// Record Utilities
+type Student = "Amara" | "Chris" | "Marry";
+type GradePoint = "A" | "B" | "C" | "U";
+
+const finalGrades: Record<Student, GradePoint> = {
+  Amara: "A",
+  Chris: "B",
+  Marry: "U",
+};
+
+interface Grades {
+  assignA: number;
+  assignB: number;
+}
+
+const semesterGrades: Record<Student, Grades> = {
+  Amara: { assignA: 32, assignB: 63 },
+  Chris: { assignA: 54, assignB: 52 },
+  Marry: { assignA: 43, assignB: 56 },
+};
+
+console.log(semesterGrades);
+
+// Pick and Omit Utilities
+type AssignResult = Pick<Assignment, "studentId" | "grade">;
+
+const assignResult: AssignResult = {
+  studentId: "132",
+  grade: 3.78,
+};
+
+type AssignPreview = Omit<Assignment, "studentId" | "title">;
+
+const assignPreview: AssignPreview = {
+  grade: 3.56,
+  verfied: true,
+};
+
+type AdjustGrade = Exclude<GradePoint, "U">;
+
+type HighGrade = Extract<GradePoint, "A" | "B">;
+
+type AllGradePoints = "A" | "B" | "C" | "D" | "E" | "F" | null | undefined;
+
+type NameOnly = NonNullable<AllGradePoints>;
+
+// Return Type
+// type NewlyAssign = { title: string; points: number };
+
+// const createNewlyAssign = (title: string, points: number):NewlyAssign => {
+//   return { title, points };
+// };
+
+const createNewlyAssign = (title: string, points: number) => {
+  return { title, points };
+};
+
+type NewAssign = ReturnType<typeof createNewlyAssign>;
+
+const newAssign: NewAssign = createNewlyAssign("Utility Assing", 60);
+console.log(newAssign);
+
+// Parameters
+type AssignParams = Parameters<typeof createNewlyAssign>;
+
+const assignArgsA: AssignParams = ["Assign A", 4];
+
+const assignArgsB: NewAssign = createNewlyAssign(...assignArgsA);
+console.log(assignArgsB);
+
+// Awaited
+interface User {
   id: number;
+  name: string;
+  username: string;
+  email: string;
+  address: string;
 }
 
-const processUser = <T extends HasId>(user: T): T => {
-  return user;
+const fetchUsers = async (): Promise<User[]> => {
+  const data = await fetch("https://jsonplaceholder.typicode.com/users")
+    .then((res) => {
+      return res.json();
+    })
+    .catch((err) => {
+      if (err instanceof Error) console.log(err.message);
+    });
+
+  return data;
 };
 
-console.log(processUser({ id: 36, name: "Shun" }));
+type FetchUserReturn = Awaited<ReturnType<typeof fetchUsers>>;
 
-const getUserProperty = <T extends HasId, K extends keyof T>(
-  users: T[],
-  key: K
-): T[K][] => {
-  return users.map((user) => user[key]);
-};
-
-const usersArray = [
-  {
-    id: 1,
-    name: "John Doe",
-    username: "johndoe",
-    email: "john.doe@example.com",
-    address: {
-      street: "123 Main St",
-      suite: "Apt. 101",
-      city: "Anytown",
-      zipcode: "12345",
-      geo: {
-        lat: "40.7128",
-        lng: "-74.0060",
-      },
-    },
-    phone: "555-555-5555",
-    website: "johndoe.com",
-    company: {
-      name: "ABC Inc.",
-      catchPhrase: "Empowering businesses worldwide",
-      bs: "Innovate and grow",
-    },
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    username: "janesmith",
-    email: "jane.smith@example.com",
-    address: {
-      street: "456 Elm St",
-      suite: "Suite 200",
-      city: "Smalltown",
-      zipcode: "54321",
-      geo: {
-        lat: "35.6895",
-        lng: "139.6917",
-      },
-    },
-    phone: "555-123-4567",
-    website: "janesmith.com",
-    company: {
-      name: "XYZ Corp.",
-      catchPhrase: "Driving innovation forward",
-      bs: "Exceeding expectations",
-    },
-  },
-];
-
-console.log(getUserProperty(usersArray, "name"));
-console.log(getUserProperty(usersArray, "email"));
-
-class StateObject<T> {
-  private value: T;
-
-  constructor(item: T) {
-    this.value = item;
-  }
-
-  get data(): T {
-    return this.value;
-  }
-
-  set data(item: T) {
-    this.value = item;
-  }
-}
-
-const store = new StateObject("Victoria");
-console.log(store.data);
-store.data = "Smith";
-console.log(store.data);
-// store.data = 12;   // it can't be because of inferring the Victoria Type string
-
-const myStore = new StateObject<(string | number | boolean)[]>([20]);
-myStore.data = ["Smith", 32, false];
-console.log(myStore.data);
-// myStore.data = 'welcome' // it can't be because of inferring the union Array Type
+fetchUsers().then((users) => console.log(users));
