@@ -1,107 +1,95 @@
-// 1st Phase
-class Developer {
-  secondLang!: string;
+// using index signature
 
-  constructor(
-    public readonly name: string,
-    public music: string,
-    private age: number,
-    protected lang: string = "TypeScript"
-  ) {}
-
-  public getAge() {
-    return `Welcome. Btw, I'm ${this.age}`;
-  }
+// Phase 1
+// interface TransactionObj {
+//   readonly [index: string]: number;
+// }
+interface TransactionObj {
+  readonly [index: string]: number;
+  Food: number;
+  Books: number;
+  Hobbies: number;
 }
 
-const developer = new Developer("Chase", "Rock", 24);
-console.log(developer.getAge());
+// interface TransactionObj {
+//   Food: string;
+//   Books: string;
+//   Hobbies: string;
+// }
 
-class WebDev extends Developer {
-  constructor(
-    public computer: string,
-    name: string,
-    music: string,
-    age: number
-  ) {
-    super(name, music, age);
-    this.computer = computer;
+const transactionObj: TransactionObj = {
+  Food: 20,
+  Books: 10,
+  Hobbies: 30,
+  Job: 33,
+};
+
+console.log(transactionObj.Books);
+console.log("Books (pointer)" + transactionObj["Books"]);
+
+const prop: string = "Books";
+console.log("Books (index signature)" + transactionObj[prop]);
+
+const todayTrans = (transactions: TransactionObj): number => {
+  let total = 0;
+  for (const transaction in transactions) {
+    total += transactions[transaction];
   }
+  return total;
+};
 
-  public getLang() {
-    return `I know ${this.lang}`;
-  }
-}
+console.log(todayTrans(transactionObj));
+console.log(transactionObj["Job"]);
 
-const webDev = new WebDev("Super Pc", "David", "Spotify", 24);
-console.log(webDev.getLang());
-
-// 2nd Phase
-interface Muscian {
+// Phase 2
+interface Student {
+  // [key: string]: string | number | number[] | undefined;
   name: string;
-  instrument: string;
-  play(action: string): string;
+  gpa: number;
+  classes?: number[];
 }
 
-class Guitarist implements Muscian {
-  name: string;
-  instrument: string;
+const student: Student = {
+  name: "John",
+  gpa: 3.5,
+  classes: [100, 300],
+};
 
-  constructor(name: string, instrument: string) {
-    this.name = name;
-    this.instrument = instrument;
-  }
+// console.log(student.test);
 
-  play(action: string): string {
-    return `${this.name} ${action} the ${this.instrument}.`;
-  }
+for (const key in student) {
+  console.log(`${key} ${student[key as keyof Student]}`);
 }
 
-const artist = new Guitarist("Gross", "guitar");
-console.log(artist.play("plays"));
+Object.keys(student).map((key) => {
+  console.log(`${key} ${student[key as keyof typeof student]}`);
+});
 
-// 3rd Phase
-class Team {
-  static count: number = 0;
+const logStudentKey = (student: Student, key: keyof Student): void => {
+  console.log(`Student ${key} is ${student[key]}`);
+};
 
-  public id: number;
-  constructor(public name: string) {
-    this.name = name;
-    this.id = ++Team.count;
-  }
+logStudentKey(student, "gpa");
+logStudentKey(student, "name");
+
+// Phase 3
+// using Record utilities
+
+// interface Streams {
+//   salary: string;
+//   bonus: string;
+//   fees: string;
+// }
+type Streams = "salary" | "bonus" | "fees";
+
+type Incomes = Record<Streams, string | number>;
+
+const incomes: Incomes = {
+  salary: 100,
+  bonus: 400,
+  fees: "600",
+};
+
+for (const revenue in incomes) {
+  console.log(`${revenue} ${incomes[revenue as keyof Incomes]}`);
 }
-
-const memberA = new Team("Janes");
-const memberB = new Team("Jonson");
-
-console.log(memberA.id);
-console.log(memberB.id);
-console.log("no. of instances: " + Team.count);
-
-// 4th Phase
-class Project {
-  private sources: string[];
-
-  constructor() {
-    this.sources = [];
-  }
-
-  public get data(): string[] {
-    return this.sources;
-  }
-
-  public set data(value: string[]) {
-    if (Array.isArray(value) && value.every((val) => typeof val === "string")) {
-      this.sources = value;
-      return;
-    } else {
-      throw new Error("Param is not in an array of strings");
-    }
-  }
-}
-
-const projA = new Project();
-projA.data = ["Kyaw Kyaw", "Aung Aung"];
-console.log(projA.data);
-projA.data = [...projA.data, "Min Min"];
-console.log(projA.data);
